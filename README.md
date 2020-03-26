@@ -1,6 +1,6 @@
 # Dashboard
 
-Kanban style dashboard.  Code included is front-end only.  Backend was written in Javascript, MongoDB and Meteor.js.
+Kanban style dashboard.  Code included is front-end only.  Backend was written in Javascript, MongoDB and Meteor.js.  I designed and developed the entire frontend and all supporting backend calls.
 
 ## Estimate View
 
