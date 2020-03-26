@@ -1,0 +1,324 @@
+<template name="invoiceCard">
+
+    <style>
+        .estimate-card-link {
+            color: #489ACC;
+            text-decoration: none;
+        }
+        .estimate-card-link:hover {
+            color: #489ACC;
+            text-decoration: none;
+        }
+        .order-link .order-link:hover {
+            color: #224C66;
+            text-decoration: none;
+        }
+        .order-link:hover {
+            color: #224C66;
+            text-decoration: none;
+        }
+        #avatar-circle {
+            background-color: #71B085;
+            cursor: pointer;
+        }
+        #assign-estimate {
+            background-color: #489ACC;
+            border-color: #489ACC;
+        }
+        .on-hold {
+            color: #E37E7D;
+        }
+        .resume {
+            color: #71B085;
+        }
+        #hold-workorder {
+            border: none;
+            margin-left: 4px;
+        }
+        #resume-workorder {
+            border: none;
+            margin-left: 4px;
+        }
+        #resume-workorder:hover {
+            border: none;
+            margin-left: 4px;
+        }
+        #hold-workorder:hover {
+            background-color: white;
+        }
+        .hold-summary {
+            font-size: 14px;
+        }
+        .dispatch-truck {
+            margin-right: 2px;
+        }
+
+        #job-card {
+            background-color: #ffffff;
+        }
+
+        #workorder-card {
+            background-color: #ffffff;
+            border: 1px solid #DFE1E6;
+            border-bottom: 0.1rem solid #ccc;
+        }
+  
+    </style>
+
+    <!-- Card -->
+    <div class="kanban-item">
+        <div class="card card-sm mb-2" id="job-card">
+            {{#if noOrders estimate}}
+
+                <!-- Handle estimate with no work orders -->
+                <div class="card-body" style="padding-bottom:0.9rem;">
+
+                    {{#if isVip estimate}}
+                    <p class="mb-3">
+                        <span class="badge badge-soft-success">
+                            VIP
+                        </span>
+                    </p>
+                    {{/if}}
+                    
+                    <h3 class="card-title">
+                        <strong><a class="estimate-card-link" href="{{estimateUrl estimate}}">{{formattedAddress estimate}}</a></strong>
+                    </h3> 
+                    <h6 class="territory-title">
+                        {{territoryName estimate}}
+                    </h6>
+
+                    <div class="row align-items-center no-gutters pt-1 mb-0">
+                        <div class="col-auto">
+                            <div class="small mr-2">{{daysLapsed estimate}} Days</div>
+                        </div>
+                        <div class="col">
+                            <div class="progress progress-sm">
+                            <div class="progress-bar" role="progressbar" style="width: {{percentComplete estimate}}%" aria-valuenow="{{percentComplete estimate}}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                                    
+                    <!-- Footer -->
+                    <div class="row align-items-center mt-0 pt-1">
+                        <!-- Time -->
+                        <div class="col">
+                            <p class="card-text small text-muted">
+                                <i class="fe fe-mail"></i><span class="ml-1 date-tooltip" title="Invoice date">{{invoiceDate estimate}}</span>
+                            </p>
+
+                        </div>
+                        <!-- Assigned User -->
+                        <div class="col-auto">
+                        
+                            {{#let user=(assignedUser estimate) }}
+
+                                {{#if user}}
+                                    <!-- Avatar group -->                                
+                                    <div class="avatar-group">
+                                        {{#if user.services.google.picture}}
+                                            <img src="{{user.services.google.picture}}" class="avatar-img rounded-circle avatar-tooltip js-assign" data-id={{estimate._id}} data-toggle="modal" data-target="#modalMembers" title="{{user.profile.name}}" alt="{{user.profile.name}}">
+                                        {{else}}
+                                            {{#let initials=(userInitials user)}}
+                                                {{#if initials}}
+                                                    <div class="avatar avatar-xs">
+                                                        <span id="avatar-circle" class="avatar-title rounded-circle avatar-tooltip js-assign" data-id={{estimate._id}} data-toggle="modal" data-target="#modalMembers" title="{{user.profile.name}}">{{initials}}</span>
+                                                    </div>
+                                                {{/if}}
+                                            {{/let}}
+                                        {{/if}}
+                                    </div>
+                                {{else}}
+                                    <!-- Buttons -->
+                                    <button class="btn btn-sm btn-primary js-assign" id="assign-estimate" data-id={{estimate._id}} data-toggle="modal" data-target="#modalMembers">
+                                        Assign
+                                    </button>
+                                {{/if}}
+
+                            {{/let}}
+
+                        </div>
+                    </div> 
+
+                    <hr>
+
+                    <!-- Quickbooks Information -->
+                    <div class="row align-items-center mt-0 pt-1 pb-0">
+                        <div class="col card-text small">
+                            <h5 class="pb-1 mb-0">Customer:</h5>
+                            <p class="pt-0 mt-0"><a target="_blank" href="https://c38.qbo.intuit.com/app/customerdetail?nameId={{estimate.quickBooks.customerId}}">{{estimate.quickBooks.displayName}}</a></p>
+
+                            <h5 class="pb-1 mb-0 pt-0">Invoice:</h5>
+                            <p class="mb-0 pb-0"><a target="_blank" href="https://c38.qbo.intuit.com/app/invoice?txnId={{estimate.quickBooks.invoiceId}}">Invoice #{{estimate.quickBooks.invoiceNum}}</a></p>
+
+                            {{#if hasPayments estimate}}
+                                <h5 class="pt-3 mb-0 mt-2">Payments:</h5>
+                                {{#each payment in estimate.quickBooks.payments}}
+    
+                                    {{#if processedWithStripe payment}}
+                                    <p class="mb-0 pb-0"><a class="order-link" target="_blank" href="https://c38.qbo.intuit.com/app/recvpayment?txnId={{payment.Id}}">{{payment.Id}}: Stripe ${{payment.amount}} {{#if payment.markAsPaid}}PAID{{/if}}</a><br><i>{{payment.memo}}</i></p>
+                                    {{else}}
+                                    <p class="mb-0 pb-0"><a class="order-link" target="_blank" href="https://c38.qbo.intuit.com/app/recvpayment?txnId={{payment.Id}}">{{payment.Id}}: Check #{{payment.checkNum}} ${{payment.amount}} {{#if payment.markAsPaid}}PAID{{/if}}</a><br><i>{{payment.memo}}</i></p>
+                                    {{/if}}
+    
+                                {{/each}}
+                            {{/if}}
+                        </div>
+                    </div>
+                        
+                </div><!-- / body -->
+
+            {{else}}
+
+                <!-- Handle estimate with work orders -->
+                <div class="card-body" style="padding-bottom:0.9rem;">
+
+                    {{#if isVip estimate}}
+                    <p class="mb-3">
+                        <span class="badge badge-soft-success">
+                            VIP
+                        </span>
+                    </p>
+                    {{/if}}
+
+                    {{#if estimate.onHold}}
+                    <!-- Badge -->
+                    <p class="mb-3">
+                        <span class="badge badge-soft-danger">
+                            Hold
+                        </span>
+                    </p>
+                    {{/if}}
+
+                    <h3 class="card-title">
+                        <strong><a class="estimate-card-link" href="{{estimateUrl estimate}}">{{formattedAddress estimate}}</a></strong>
+                    </h3> 
+                    <h6 class="territory-title pb-0 mb-1">
+                        {{territoryName estimate}}
+                    </h6>
+
+                    <!-- Estimate Value -->
+                    <p class="mb-2 pb-1 mt-1 pt-0">
+                        {{estimateValue estimate}}
+                    </p>
+
+                    <!-- Work Order Cards -->
+                    {{#each order in orders}}
+
+                        <div class="card card-sm mb-2" id="workorder-card">
+                            <div class="card-body" style="padding-bottom:0.9rem;">
+
+                                {{#if order.onHold}}
+                                <!-- Badge -->
+                                <p class="mb-3">
+                                    <span class="badge badge-soft-danger">
+                                        Hold
+                                    </span>
+                                </p>
+                                {{/if}}
+
+                                <h4 class="card-title pb-0 mb-1">
+                                    <strong><a class="order-link" href="{{orderUrl estimate order}}">{{order.publicId}}</a></strong>
+                                </h4>
+
+                                {{#if order.holdNotes}}
+                                    <!-- Order Hold Notes -->
+                                    <p class="mb-1 mt-2 hold-summary">
+                                        {{order.holdNotes}}
+                                    </p>
+                                {{/if}}
+
+                                <div class="row align-items-center no-gutters pt-1 mb-0">
+                                    <div class="col-auto">
+                                        <div class="small mr-2">{{daysLapsed estimate}} Days</div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="progress progress-sm">
+                                        <div class="progress-bar" role="progressbar" style="width: {{percentComplete estimate}}%" aria-valuenow="{{percentComplete estimate}}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Footer -->
+                                <div class="row align-items-center pt-1 mt-0">
+                                    <div class="col">
+                                        <!-- Time -->
+                                        <p class="card-text small text-muted">
+                                            <i class="fe fe-mail"></i><span class="ml-1 date-tooltip" title="Invoice date">{{invoiceDate estimate}}</span>  
+                                            <button class="btn btn-sm btn-white resume-button" style="display: {{onHoldStatus order}}" id="resume-workorder" data-id="{{order._id}}" data-instance="{{estimate._id}}" data-toggle="tooltip" title="Resume">
+                                                <span class="fe fe-play-circle resume"></span>
+                                            </button>
+                                            <button class="btn btn-sm btn-white on-hold-button" style="display: {{inProcessStatus order}}" id="hold-workorder" data-id="{{order._id}}" data-instance="{{estimate._id}}" data-toggle="modal" data-target="#modalHoldWorkOrder" title="Put on hold">
+                                                <span class="fe fe-pause-circle on-hold"></span>
+                                            </button>
+                                        </p>
+            
+                                    </div>
+                                    <!-- Assigned User -->
+                                    <div class="col-auto">
+                                    
+                                        {{#let user=(assignedUser estimate) }}
+            
+                                            {{#if user}}
+                                                <!-- Avatar group -->                                
+                                                <div class="avatar-group">
+                                                    {{#if user.services.google.picture}}
+                                                        <img src="{{user.services.google.picture}}" class="avatar-img rounded-circle avatar-tooltip js-assign" data-id={{estimate._id}} data-toggle="modal" data-target="#modalMembers" title="{{user.profile.name}}" alt="{{user.profile.name}}">
+                                                    {{else}}
+                                                        {{#let initials=(userInitials user)}}
+                                                            {{#if initials}}
+                                                                <div class="avatar avatar-xs">
+                                                                    <span id="avatar-circle" class="avatar-title rounded-circle avatar-tooltip js-assign" data-id={{estimate._id}} data-toggle="modal" data-target="#modalMembers" title="{{user.profile.name}}">{{initials}}</span>
+                                                                </div>
+                                                            {{/if}}
+                                                        {{/let}}
+                                                    {{/if}}
+                                                </div>
+                                            {{else}}
+                                                <!-- Buttons -->
+                                                <button class="btn btn-sm btn-primary js-assign" id="assign-estimate" data-id={{estimate._id}} data-toggle="modal" data-target="#modalMembers">
+                                                    Assign
+                                                </button>
+                                            {{/if}}
+            
+                                        {{/let}}
+            
+                                    </div>
+                                </div> 
+                            </div><!-- / body -->
+                        </div>
+
+                    {{/each}}
+
+                    <!-- Quickbooks Information -->
+                    <div class="row align-items-center mt-3 pt-2 pb-0">
+                        <div class="col card-text small">
+                            <h5 class="pb-1 mb-0">Customer:</h5>
+                            <p class="pt-0 mt-0"><a target="_blank" href="https://c38.qbo.intuit.com/app/customerdetail?nameId={{estimate.quickBooks.customerId}}">{{estimate.quickBooks.displayName}}</a></p>
+
+                            <h5 class="pb-1 mb-0 pt-0">Invoice:</h5>
+                            <p class="mb-0 pb-0"><a target="_blank" href="https://c38.qbo.intuit.com/app/invoice?txnId={{estimate.quickBooks.invoiceId}}">Invoice #{{estimate.quickBooks.invoiceNum}}</a></p>
+
+                            {{#if hasPayments estimate}}
+                                <h5 class="pt-3 mb-0 mt-2">Payments:</h5>
+                                {{#each payment in estimate.quickBooks.payments}}
+    
+                                    {{#if processedWithStripe payment}}
+                                    <p class="mb-0 pb-0"><a class="order-link" target="_blank" href="https://c38.qbo.intuit.com/app/recvpayment?txnId={{payment.Id}}">{{payment.Id}}: Stripe ${{payment.amount}} {{#if payment.markAsPaid}}PAID{{/if}}</a><br><i>{{payment.memo}}</i></p>
+                                    {{else}}
+                                    <p class="mb-0 pb-0"><a class="order-link" target="_blank" href="https://c38.qbo.intuit.com/app/recvpayment?txnId={{payment.Id}}">{{payment.Id}}: Check #{{payment.checkNum}} ${{payment.amount}} {{#if payment.markAsPaid}}PAID{{/if}}</a><br><i>{{payment.memo}}</i></p>
+                                    {{/if}}
+    
+                                {{/each}}
+                            {{/if}}
+                        </div>
+                    </div>
+
+                </div>
+
+            {{/if}}
+
+        </div>
+    </div>
+
+</template>

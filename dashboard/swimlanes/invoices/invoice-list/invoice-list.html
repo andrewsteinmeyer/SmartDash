@@ -1,0 +1,123 @@
+<template name="invoiceList"> 
+
+    <style>
+        .styled-link .order-link:hover {
+            color: #224C66;
+            text-decoration: none;
+        }
+        .styled-link:hover {
+            color: #224C66;
+            text-decoration: none;
+        }
+        .estimate-table {
+          border-top-left-radius: 2px;
+          border-top-right-radius: 3px;
+          border: none;
+          font-size: 15px;
+        }
+
+        .table thead tr th {
+          background-color: #235EA7;
+        }
+
+        .table {
+            table-layout: fixed;
+        }
+
+    </style>
+
+    <div class="wrapper">
+
+        {{#if estimateCount}}
+        
+        <!-- Header -->
+        <div class="row py-3">
+            <div class="col">
+                
+                <!-- Heading -->
+                <h2 class="mb-0">{{status}} <small>({{estimateCount}})</small></h2>
+
+            </div>
+            <div class="col-auto">
+                
+                <!-- Heading -->
+                <h2>
+                    <span class="badge badge-secondary mb-0 pull-right">{{totalEstimatesValue}}</span>
+                </h2>
+
+            </div>
+        </div> <!-- / .row -->
+
+        <!-- Estimate Table Card -->
+        <div class="estimate-table">
+
+            <!-- Table Headers -->
+            <table class="table table-sm">
+                <thead class="thead-dark">
+                <tr>
+                    <th>
+                    Address
+                    </th>
+                    <th>
+                    Territory
+                    </th>
+                    <th>
+                    Age
+                    </th>
+                    <th>
+                    Invoice Date
+                    </th>
+                    <th>
+                    Estimate Amt
+                    </th>
+                    <th>
+                    Invoice Amt
+                    </th>
+                    <th>
+                    Invoice #
+                    </th>
+                    <th>
+                    Customer
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <!-- Estimate Table Rows -->
+                {{#each estimate in estimates}}
+                <tr>
+                    <td>
+                    <a class="styled-link" href="{{estimateUrl estimate}}">{{formattedAddress estimate}}</a>
+                    </td>
+                    <td>
+                    {{territoryName estimate}}
+                    </td>
+                    <td>
+                    {{daysLapsed estimate}}
+                    </td>
+                    <td>
+                    {{invoiceDate estimate}}
+                    </td>
+                    <td>
+                    {{estimateValue estimate}}
+                    </td>
+                    <td>
+                    {{invoiceAmt estimate}}
+                    </td>
+                    <td>
+                    <a class="styled-link" target="_blank" href="https://c38.qbo.intuit.com/app/invoice?txnId={{estimate.quickBooks.invoiceId}}">Invoice #{{estimate.quickBooks.invoiceNum}}</a>
+                    </td>
+                    <td>
+                    <a class="styled-link" target="_blank" href="https://c38.qbo.intuit.com/app/customerdetail?nameId={{estimate.quickBooks.customerId}}">{{getClients estimate}}</a>
+                    </td>
+                </tr>
+                {{/each}}
+
+                </tbody>
+            </table>
+        </div>
+
+        {{/if}}
+
+    </div>
+</template>

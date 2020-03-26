@@ -1,0 +1,190 @@
+<template name="estimateCard">
+
+    <style>
+        .estimate-card-link {
+            color: #489ACC;
+            text-decoration: none;
+        }
+        .estimate-card-link:hover {
+            color: #489ACC;
+            text-decoration: none;
+        }
+        #avatar-circle {
+            background-color: #71B085;
+            cursor: pointer;
+        }
+        #assign-estimate {
+            background-color: #489ACC;
+            border-color: #489ACC;
+        }
+        .on-hold {
+            color: #E37E7D;
+        }
+        .resume {
+            color: #71B085;
+        }
+        #hold-estimate {
+            border: none;
+            margin-left: 6px;
+        }
+        #resume-estimate {
+            border: none;
+            margin-left: 6px;
+        }
+        #move-to-review {
+            border: none;
+            color: #888888;
+        }
+        #move-to-release {
+            border: none;
+            color: #888888;
+        }
+        #resume-estimate:hover {
+            background-color: white;
+        }
+        #hold-estimate:hover {
+            background-color: white;
+        }
+        #move-to-review:hover {
+            background-color: white;
+        }
+        #move-to-release:hover {
+            background-color: white;
+        }
+        .hold-summary {
+            font-size: 14px;
+        }
+
+        #estimate-card {
+            background-color: #ffffff;
+        }
+
+        .in-progress {
+            color: #235DA5;
+        }
+
+        .urgent-deadline {
+            color: orange;
+        }
+  
+    </style>
+
+    <!-- Card -->
+    <div class="kanban-item">
+        <div class="card card-sm mb-2" id="estimate-card">
+
+            <div class="card-body" style="padding-bottom:0.9rem;">
+
+                {{#if isVip estimate}}
+                <p class="mb-3">
+                    <span class="badge badge-soft-success">
+                        VIP
+                    </span>
+                </p>
+                {{/if}}
+                
+                {{#if estimate.onHold}}
+                <!-- On Hold Badge -->
+                <p class="mb-3">
+                    <span class="badge badge-soft-danger">
+                        Hold
+                    </span>
+                </p>
+                {{/if}}
+
+                {{#if estimate.readyToMatch}}
+                <!-- Ready To Match Badge -->
+                <p class="mb-3">
+                    <span class="badge badge-soft-primary">
+                       Ready To Match
+                    </span>
+                </p>
+                {{/if}}
+
+                {{#if estimate.automatchInProgress}}
+                <!-- Automatch In Progress Badge -->
+                <p class="mb-3">
+                    <i class="fas fa-puzzle-piece in-progress"></i>
+                    <span class="badge badge-soft-secondary">
+                       Automatch In Progress
+                    </span>
+                </p>
+                {{/if}}              
+
+                <h3 class="card-title">
+                    <strong><a class="estimate-card-link" href="{{estimateUrl estimate}}">{{formattedAddress estimate}}</a></strong>
+                </h3> 
+                <h6 class="territory-title mb-2">
+                    {{territoryName estimate}}
+                </h6>
+
+                {{#if estimate.holdNotes}}
+                <!-- Estimate Hold Notes -->
+                <p class="mb-1 mt-1 hold-summary">
+                    {{estimate.holdNotes}}
+                </p>
+                {{/if}}
+                                
+                <!-- Footer -->
+                <div class="row align-items-center mt-0 pt-0">
+                    <div class="col">
+                        <!-- Time -->
+                        <p class="card-text small text-muted">
+                            <i class="fe fe-clock date-tooltip" style="color: {{deadlineColor estimate}}" title="{{hoursUntilDue estimate}}"></i> 
+                            <span class="ml-1 date-tooltip" title="Due date">{{dueDate estimate}}<br>{{dueTime estimate}} </span> 
+                            <button class="btn btn-sm btn-white resume-button" style="display: {{onHoldStatus estimate}}" id="resume-estimate" data-id="{{estimate._id}}" title="Resume">
+                                <span class="fe fe-play-circle resume"></span>
+                            </button>
+                            <button class="btn btn-sm btn-white on-hold-button" style="display: {{inProcessStatus estimate}}" id="hold-estimate" data-id="{{estimate._id}}" data-toggle="modal" data-target="#modalHoldEstimate" title="Put on hold">
+                                <span class="fe fe-pause-circle on-hold"></span>
+                            </button>
+                            {{#if inReviewStatus estimate}}
+                                <button class="ml-0 pl-2 btn btn-sm btn-white move-to-button" id="move-to-release" data-id="{{estimate._id}}" data-toggle="modal" data-target="#modalReadyToRelease" title="Submit for release">
+                                    <span class="fe fe-chevron-right move-to-release"></span>
+                                </button>
+                            {{/if}}
+                            {{#if inComposingStatus estimate}}
+                            <button class="ml-0 pl-2 btn btn-sm btn-white move-to-button" id="move-to-review" data-id="{{estimate._id}}" data-toggle="modal" data-target="#modalReadyToReview" title="Submit for review">
+                                <span class="fe fe-chevron-right move-to-review"></span>
+                            </button>
+                            {{/if}}
+                        </p>
+
+                    </div>
+                    <div class="col-auto">
+                    
+                        {{#let user=(assignedUser estimate) }}
+
+                            {{#if user}}
+                                <!-- Avatar group -->                                
+                                <div class="avatar-group">
+                                    {{#if user.services.google.picture}}
+                                        <img src="{{user.services.google.picture}}" class="avatar-img rounded-circle avatar-tooltip js-assign" data-id={{estimate._id}} data-toggle="modal" data-target="#modalMembers" title="{{user.profile.name}}" alt="{{user.profile.name}}">
+                                    {{else}}
+                                        {{#let initials=(userInitials user)}}
+                                            {{#if initials}}
+                                                <div class="avatar avatar-xs">
+                                                    <span id="avatar-circle" class="avatar-title rounded-circle avatar-tooltip js-assign" data-id={{estimate._id}} data-toggle="modal" data-target="#modalMembers" title="{{user.profile.name}}">{{initials}}</span>
+                                                </div>
+                                            {{/if}}
+                                        {{/let}}
+                                    {{/if}}
+                                </div>
+                            {{else}}
+                                <!-- Buttons -->
+                                <button class="btn btn-sm btn-primary js-assign" id="assign-estimate" data-id={{estimate._id}} data-toggle="modal" data-target="#modalMembers">
+                                    Assign
+                                </button>
+                            {{/if}}
+
+                        {{/let}}
+
+                    </div>
+                </div> <!-- / body -->
+
+            </div>
+
+        </div>
+    </div>
+
+</template>

@@ -1,0 +1,65 @@
+<template name="workOrderLane"> 
+    <div class="col-12 mr-1 pr-1">
+        
+        <!-- Header -->
+        <div class="card" id="swimlane-header">
+            <div class="card-header card-header-flush">
+                <div class="row align-items-center">
+                    <div class="col">
+    
+                        <!-- Title -->
+                        <h4 class="card-header-title">
+                            {{status}} ({{estimateCount}})
+                        </h4> 
+                        Due today ({{estimatesDueToday}}) 
+    
+                    </div>
+                    <div class="col-auto mr-1 pr-0">
+    
+                        <!-- Dropdown Menu -->
+                        <div class="dropdown">
+                            <span class="badge badge-secondary mb-1" style="font-size: 14px;">{{totalEstimatesValue}}</span>
+    
+                            <a href="#" class="dropdown-ellipses dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fe fe-more-vertical"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a href="#" class="dropdown-item" id="date-ascending">
+                                    {{sortNameForStatus}}: Ascending
+                                </a>
+                                <a href="#" class="dropdown-item" id="date-descending">
+                                    {{sortNameForStatus}}: Descending
+                                </a>
+                            </div>
+                        </div>
+
+                     </div>
+                </div> <!-- / .row -->
+            </div>          
+        </div>
+           
+        <!-- Swimlane for Estimate Status -->
+        <div class="card" id="swimlane">
+            <div class="card-body" style="padding-top:0px">
+
+                {{#if estimatesReady}}
+                    <!-- Category -->
+                    <div class="kanban-category">
+
+                        {{#each estimate in estimates}}
+                            {{> workOrderCard (cardArgs estimate)}}
+                        {{/each}}
+                        
+                    </div>
+                {{else}}
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                {{/if}}
+
+            </div>
+        </div>
+            
+    </div>
+</template>
+    
