@@ -18,7 +18,8 @@ The workorder view was used by the field and territory managers to manage jobs t
 
 ## Invoice View
 
-The invoice view was used to keep track of outstanding invoices.  Cards automatically moved columns based upon age of invoice.  User could toggle betweeen card view (1) or spreadsheet style view (2)
+The invoice view was used to keep track of outstanding invoices.  Cards automatically moved columns based upon age of invoice.  User could toggle between the column view or row view.
 
+#### Column View
 ![image](https://user-images.githubusercontent.com/6377577/77598017-0d657b80-6ed7-11ea-8ee8-feb8eb93da57.png)
 
