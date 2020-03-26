@@ -14,7 +14,7 @@ The estimate view was used to keep track of repair estimates.  The cards automat
 
 The workorder view was used by the field and territory managers to manage jobs that were in progress.  The cards update as items are marked off on each repair job.  
 
-![Workorder View](https://user-images.githubusercontent.com/6377577/77597532-8ebc0e80-6ed5-11ea-925c-133ba78bcead.png)
+![Workorder View](https://user-images.githubusercontent.com/6377577/77597944-c5deef80-6ed6-11ea-9d8f-2d21d1002bcb.png)
 
 ## Invoice View
 
