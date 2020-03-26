@@ -24,7 +24,7 @@ The invoice view was used to keep track of outstanding invoices.  Cards automati
 ![image](https://user-images.githubusercontent.com/6377577/77598017-0d657b80-6ed7-11ea-8ee8-feb8eb93da57.png)
 
 #### Row View
-![image](https://user-images.githubusercontent.com/6377577/77598516-6386ee80-6ed8-11ea-9e93-f43b0a8a677f.png)
+![image](https://user-images.githubusercontent.com/6377577/77602258-59b6b880-6ee3-11ea-8b1b-85ebb6cb74d4.png)
 
 ## Notifications
 
