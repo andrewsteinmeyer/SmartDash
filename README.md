@@ -2,7 +2,7 @@
 
 Kanban style dashboard.  Code included is front-end only.  Backend was written in Javascript, MongoDB and Meteor.js.  I designed and developed the entire frontend and all supporting backend calls.
 
-The user could search for an address and the dashboard filter and update in realtime using Meteor DDP.  The user could also switch views using the button toggle in the top right or switch territory views using the dropdown selector.
+The user could search for an address in the search bar and the dashboard would filter the cards and update in realtime using Meteor DDP.  The user could also switch views using the button toggle in the top right or switch territory views using the dropdown selector.
 
 ## Estimate View
 
